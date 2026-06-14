@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本源存储</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="storage-navbar">
+    <div class="brand">
+      <img src="avatar.png" alt="本源 logo">
+      <strong>本源存储</strong>
+    </div>
+    <div class="topbar-actions">
+      <div class="server-state" id="serverState">未登录</div>
+      <button class="logout-button hidden" id="logoutButton" type="button">退出登录</button>
+    </div>
+  </header>
+
+  <main class="storage-shell">
+    <section class="login-panel" id="loginPanel">
+      <img class="login-logo" src="avatar.png" alt="本源 logo">
+      <div class="login-heading">
+        <h1>邮箱登录</h1>
+        <p>使用邮箱和密码登录本源存储。</p>
+      </div>
+      <label>
+        邮箱
+        <input id="emailInput" type="email" placeholder="name@example.com" autocomplete="email">
+      </label>
+      <label>
+        密码
+        <input id="passwordInput" type="password" placeholder="输入密码" autocomplete="current-password">
+      </label>
+      <button class="login-button" id="loginButton" type="button">登录</button>
+      <button class="plain-action" id="openRegisterButton" type="button">创建账号</button>
+      <p class="login-message" id="loginMessage"></p>
+    </section>
+
+    <section class="storage-area hidden" id="storageArea">
+      <aside class="storage-sidebar" aria-label="文件夹">
+        <section class="quota-card">
+          <div class="quota-label">储存容量</div>
+          <div class="quota-lines">
+            <div>
+              <span>已用</span>
+              <strong id="quotaUsedText">--</strong>
+            </div>
+            <div>
+              <span>总容量</span>
+              <strong id="quotaLimitText">--</strong>
+            </div>
+          </div>
+          <div class="quota-track" aria-hidden="true">
+            <div class="quota-fill" id="quotaFill"></div>
+          </div>
+          <div class="quota-percent" id="quotaPercentText">--</div>
+        </section>
+
+        <div class="nav-controls" aria-label="文件导航">
+          <button id="backButton" type="button" title="返回" aria-label="返回">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10.7 6.3 5 12l5.7 5.7" />
+              <path d="M5.8 12H19" />
+            </svg>
+          </button>
+          <button id="forwardButton" type="button" title="前进" aria-label="前进">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m13.3 6.3 5.7 5.7-5.7 5.7" />
+              <path d="M19 12H5" />
+            </svg>
+          </button>
+          <button id="homeButton" type="button" title="退回桌面" aria-label="退回桌面">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10.8 12 4l8 6.8" />
+              <path d="M6.5 10.5V20h5v-5.5h3V20h5v-9.5" />
+            </svg>
+          </button>
+          <button id="refreshButton" type="button" title="刷新" aria-label="刷新">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 8a7 7 0 0 0-12.1-2.2L5 8" />
+              <path d="M5 4v4h4" />
+              <path d="M5 16a7 7 0 0 0 12.1 2.2L19 16" />
+              <path d="M19 20v-4h-4" />
+            </svg>
+          </button>
+        </div>
+
+        <section class="folder-panel">
+          <div class="folder-panel-head">
+            <h2>文件夹</h2>
+            <button class="folder-add" id="folderButton" type="button" aria-label="新建文件夹">+</button>
+          </div>
+          <div class="folder-grid" id="folderGrid"></div>
+        </section>
+      </aside>
+
+      <section class="storage-main">
+        <section class="toolbar">
+          <div>
+            <h1>文件</h1>
+            <p id="currentPath">/</p>
+          </div>
+          <div class="toolbar-actions">
+            <label class="upload-button">
+              上传文件
+              <input id="fileInput" type="file" multiple>
+            </label>
+            <label class="upload-button secondary-upload">
+              上传文件夹
+              <input id="folderInput" type="file" webkitdirectory directory multiple>
+            </label>
+          </div>
+        </section>
+
+        <section class="file-list" id="fileList"></section>
+      </section>
+    </section>
+  </main>
+
+  <div class="register-overlay hidden" id="registerOverlay" aria-hidden="true">
+    <div class="register-backdrop" data-close-register></div>
+    <section class="register-panel" role="dialog" aria-modal="true" aria-label="注册账号">
+      <img class="register-logo" src="avatar.png" alt="本源 logo">
+      <div class="login-heading">
+        <h1>注册</h1>
+        <p>创建一个本源存储账号。</p>
+      </div>
+      <label>
+        邮箱
+        <input id="registerEmailInput" type="email" placeholder="name@example.com" autocomplete="email">
+      </label>
+      <label>
+        密码
+        <input id="registerPasswordInput" type="password" placeholder="至少 6 位密码" autocomplete="new-password">
+      </label>
+      <button class="login-button" id="registerButton" type="button">注册</button>
+      <button class="plain-action" id="closeRegisterButton" type="button">我已有账户</button>
+      <p class="login-message" id="registerMessage"></p>
+    </section>
+  </div>
+
+  <script>
+    const registerOverlayFallback = document.querySelector("#registerOverlay");
+
+    function openRegisterFallback() {
+      registerOverlayFallback?.classList.remove("hidden");
+      registerOverlayFallback?.setAttribute("aria-hidden", "false");
+    }
+
+    function closeRegisterFallback() {
+      registerOverlayFallback?.classList.add("hidden");
+      registerOverlayFallback?.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelector("#openRegisterButton")?.addEventListener("click", openRegisterFallback);
+    document.querySelector("#closeRegisterButton")?.addEventListener("click", closeRegisterFallback);
+    registerOverlayFallback?.addEventListener("click", (event) => {
+      if (event.target.matches("[data-close-register]")) {
+        closeRegisterFallback();
+      }
+    });
+  </script>
+  <script type="module" src="client.js"></script>
+</body>
+</html>
