@@ -7,6 +7,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { firebaseConfig } from "./firebase-config.js";
+import { storageApiBaseUrl } from "./storage-config.js";
 
 const emailInput = document.querySelector("#emailInput");
 const passwordInput = document.querySelector("#passwordInput");
@@ -131,6 +132,14 @@ function formatSize(bytes) {
   return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
+function apiUrl(path) {
+  if (!storageApiBaseUrl) {
+    return path;
+  }
+
+  return `${storageApiBaseUrl.replace(/\/$/, "")}${path}`;
+}
+
 async function getIdToken() {
   if (!auth.currentUser) {
     throw new Error("请先登录");
@@ -147,7 +156,7 @@ async function authHeaders(extra = {}) {
 }
 
 async function request(url, options = {}) {
-  const response = await fetch(url, {
+  const response = await fetch(apiUrl(url), {
     ...options,
     headers: await authHeaders(options.headers)
   });
@@ -162,7 +171,7 @@ async function request(url, options = {}) {
 
 async function previewUrl(path) {
   const idToken = await getIdToken();
-  return `/api/preview?path=${encodeURIComponent(path)}&idToken=${encodeURIComponent(idToken)}`;
+  return apiUrl(`/api/preview?path=${encodeURIComponent(path)}&idToken=${encodeURIComponent(idToken)}`);
 }
 
 async function refreshQuota() {
@@ -414,7 +423,7 @@ async function deleteItem(path) {
 
 async function downloadItem(path) {
   const idToken = await getIdToken();
-  const url = `/api/download?path=${encodeURIComponent(path)}&idToken=${encodeURIComponent(idToken)}`;
+  const url = apiUrl(`/api/download?path=${encodeURIComponent(path)}&idToken=${encodeURIComponent(idToken)}`);
   window.open(url, "_blank");
 }
 
